@@ -1,0 +1,71 @@
+﻿@page "/Students"
+@using BlazorCRUD.lib
+@inject HttpClient http
+@inject NavigationManager navigate
+
+<h3>StudentDetails</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            @if(students == null)
+            {
+                <h3>Processing....</h3>
+            }
+            else
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Roll No</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Father Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Mobile Number</th>
+                            <th scope="col">Semester</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int id = 1;
+                        }
+                        @foreach (var std in students)
+                        {
+                            <tr>
+                                <th scope="row">@id</th>
+                                <td>@std.RollNumber</td>
+                                <td>@std.Name</td>
+                                <td>@std.FatherName</td>
+                                <td>@std.Email</td>
+                                <td>@std.MobileNumber</td>
+                                <td>@std.Semester</td>
+                                <td>
+                                    <button onclick="@(()=>deleteRecordAsync(std.Id))" class="btn- btn-danger">Delete</button>
+                                    <button onclick="@(()=>navigate.NavigateTo($"/EditStudent/{std.Id}"))" class="btn btn-secondary">Edit</button>
+                                </td>
+                            </tr>
+                            id++;
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    public IEnumerable<Student> students { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await http.GetFromJsonAsync<IEnumerable<Student>>("https://localhost:7094/api/Student");
+    }
+
+    private async Task deleteRecordAsync(int id)
+    {
+        await http.DeleteAsync("https://localhost:7094/api/Student/" + id);
+        navigate.NavigateTo("/Students", true);
+    }
+}

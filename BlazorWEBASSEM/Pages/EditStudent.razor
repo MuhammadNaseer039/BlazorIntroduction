@@ -1,0 +1,66 @@
+﻿@page "/EditStudent/{Id:int}"
+@using BlazorCRUD.lib
+@inject NavigationManager navigate
+@inject HttpClient http
+
+
+<h3>EditStudent</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <EditForm Model="student" OnValidSubmit="updateStudent">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <InputText class="form-control" @bind-Value="student.Name"></InputText>
+                    <ValidationMessage For="@(()=>student.Name)" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Father Name</label>
+                    <InputText class="form-control" @bind-Value="student.FatherName"></InputText>
+                    <ValidationMessage For="@(()=>student.FatherName)" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Roll Number</label>
+                    <InputNumber class="form-control" @bind-Value="student.RollNumber"></InputNumber>
+                    <ValidationMessage For="@(()=>student.RollNumber)" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <InputText class="form-control" @bind-Value="student.Email"></InputText>
+                    <ValidationMessage For="@(()=>student.Email)" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mobile Number</label>
+                    <InputText class="form-control" @bind-Value="student.MobileNumber"></InputText>
+                    <ValidationMessage For="@(()=>student.MobileNumber)" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Semester</label>
+                    <InputText class="form-control" @bind-Value="student.Semester"></InputText>
+                    <ValidationMessage For="@(()=>student.Semester)" />
+                </div>
+                <button type="submit" class="btn btn-success mt-3">Update Student</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    Student student = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        student = await http.GetFromJsonAsync<Student>($"https://localhost:7094/api/Student/{Id}");
+    }
+
+    private void updateStudent()
+    {
+        http.PutAsJsonAsync<Student>($"https://localhost:7094/api/Student/{student.Id}",student);
+        navigate.NavigateTo("/Students",true);
+    }
+}
